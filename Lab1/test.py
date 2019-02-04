@@ -22,9 +22,16 @@ def generate_data(n = 100):
 
     return data[s], target[s]
 
-def delta_rule(nodes=1, iterations=1, step_length=0.1):
+def delta_rule(x, t, learning_rate=0.001, epochs=20):
+    w = np.random.randn(2)  # Initializing weights
+
+    # Pseudo-code
+    # delta_w = -learning_rate(w*x - t)*x.transposed
+
+    pass
+def something_else(nodes=1, iterations=1, step_length=0.1):
     pass
 
+
 if __name__ == "__main__":
-    w = np.random.randn(2)  # Initializing weights
     x, t = generate_data(5)
