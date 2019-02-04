@@ -13,6 +13,7 @@ def generate_data(n = 100):
     # Create X and T matrices
     target = np.array([1]*n + [-1]*n)
     data = np.concatenate((classA, classB), axis=0)
+    # Adds ones for bias
     data = np.insert(data, 2, values=np.ones(n*2), axis=1)
 
     # Shuffles data
