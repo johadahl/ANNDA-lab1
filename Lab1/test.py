@@ -21,6 +21,8 @@ def generate_data(n = 100):
 
     return data[s], target[s]
 
+def delta_rule(nodes=1, iterations=1, step_length=0.1):
+    pass
 
 if __name__ == "__main__":
     w = np.random.randn(2)  # Initializing weights
