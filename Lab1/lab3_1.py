@@ -31,19 +31,19 @@ def delta_rule(x, t, epochs=20, learning_rate=0.001):
         print(delta_w)
     return w
 
-
-def test(w, x, t):
+def accuracy(w, x, t):
     predictions = []
     corr = 0
     x = x.T
     for i in range(len(t)):
-        pred = np.dot(w, x[i])
+        pred = np.dot(w[:2], x[i][:2])  # Don't take bias into consideration for threshold function
+#        pred = np.dot(w,x)             # Takes bias into account
         if pred > 0:
             predictions.append(1)
         else:
             predictions.append(-1)
 
-    for i in range(len(predictions)):
+    for i in range(len(t)):
         if predictions[i] == t[i]:
             corr += 1
     acc = corr / len(t)
@@ -53,4 +53,8 @@ if __name__ == "__main__":
     p, t = generate_data(100)
     w = delta_rule(p, t)
     print(w)
-    print(test(w, p, t))
+    print(accuracy(w, p, t))
+    print(w[2]/np.linalg.norm(w))
+
+    # TODO: Get the gradient of the separation boundary
+    # TODO: Plot line + data
