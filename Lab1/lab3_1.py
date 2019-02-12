@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 
 ## Generates two classes of data
 def generate_data(n = 100, bias=True):
-    mA = [6, 6]
-    mB = [-4, -4]
+    mA = [-20, -20]
+    mB = [20, 20]
     sigmaA = [1, 1]
     sigmaB = [2, 2]
     classA = np.random.randn(n, 2)*sigmaA + mA
@@ -104,24 +104,24 @@ def plot_sep_bound(w, x, t, title="Graph title"):
     plt.grid()
     plt.show()
 
-def evaluate():
-    l_rate = 0.01
+def evaluate_learning_rates():
+    learning_rate = [0.01, 0.001, 0.0001, 0.00001]
     e = 20
 
-    db_series = 0
-    ds_series = 0
-    pb_series = 0
-    for i in range(100):
-        p, t = generate_data(100)
-        w_rand = np.random.randn(3)  # Initializing weights
-        d_batch_w, db_acc = delta_rule_batch(w_rand, p, t, epochs=e, learning_rate=l_rate)
-        d_seq_w, ds_acc = delta_rule_seq(w_rand, p, t, epochs=e, learning_rate=l_rate)
-        p_batch_w, pb_acc = perceptron_rule_batch(w_rand, p, t, epochs=e, learning_rate=l_rate)
-        db_series += accuracy(d_batch_w, p, t)
-        ds_series += accuracy(d_seq_w, p, t)
-        pb_series += accuracy(p_batch_w, p, t)
-
-    print("%s || D-Batch: %s   || D-Seq: %s   || P-Batch: %s " % (l_rate, db_series/100, ds_series/100, pb_series/100))
+    for l_rate in learning_rate:
+        db_series = 0
+        ds_series = 0
+        pb_series = 0
+        for i in range(100):
+            p, t = generate_data(100)
+            w_rand = np.random.randn(3)  # Initializing weights
+            d_batch_w, db_acc = delta_rule_batch(w_rand, p, t, epochs=e, learning_rate=l_rate)
+            d_seq_w, ds_acc = delta_rule_seq(w_rand, p, t, epochs=e, learning_rate=l_rate)
+            p_batch_w, pb_acc = perceptron_rule_batch(w_rand, p, t, epochs=e, learning_rate=l_rate)
+            db_series += accuracy(d_batch_w, p, t)
+            ds_series += accuracy(d_seq_w, p, t)
+            pb_series += accuracy(p_batch_w, p, t)
+        print("%s || D-Batch: %s   || D-Seq: %s   || P-Batch: %s " % (l_rate, db_series/100, ds_series/100, pb_series/100))
 
 def main():
     l_rate = 0.001
@@ -155,24 +155,28 @@ def main():
 
 
 def q3():
-    l_rate = 0.01
+    l_rate = 0.001
     e = 20
 
-    for i in range(5):
+    acc = 0
+    for i in range(100):
         p, t = generate_data(100, bias=False)
         w_rand = np.random.randn(2)  # Initializing weights
         d1, d1_acc = delta_rule_batch(w_rand, p, t, epochs=e, learning_rate=l_rate)
-        print("Final accuracy for Delta rule, batch: " + str(accuracy(d1, p, t)))
+        a = accuracy(d1, p, t)
+        acc += a
+        print("Final accuracy for Delta rule, batch: " + str(a))
         print(d1)
-        plt.plot(range(len(d1_acc)), d1_acc, '-', label="Batch Delta rule run %s (%s)" % (i, accuracy(d1, p, t)))
+        plt.plot(range(len(d1_acc)), d1_acc, '-')
 
     title = 'Learning curve without bias '
     plt.title(title)
     plt.grid()
     plt.legend()
     plt.show()
+    print(acc/100)
 
 if __name__ == "__main__":
-    #main()
+    main()
     #q3()
-    evaluate()
+    #evaluate_learning_rates()

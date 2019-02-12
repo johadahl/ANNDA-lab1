@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 ## Generates two classes of data
-def generate_data(n = 100, bias=True, specific=False):
+def generate_data(n = 100, specific=False):
     if specific:
         mA = [1, 0.3]
         mB = [0, -0.1]
@@ -16,21 +16,23 @@ def generate_data(n = 100, bias=True, specific=False):
         classA = np.concatenate((classA_x1, classA_x2), axis=1)
         classB = np.random.randn(n, 2) * sigmaB + mB
     else:
-        mA = [2, 2]
+        mA = [20, 20]
         mB = [-2, -2]
-        sigmaA = [2, 2]
-        sigmaB = [2, 2]
-
+        sigmaA = [1, 1]
+        sigmaB = [1, 1]
         classA = np.random.randn(n, 2) * sigmaA + mA
         classB = np.random.randn(n, 2) * sigmaB + mB
 
+    print(classA)
+    print(classB)
 
     # Create X and T matrices
     target = np.array([1]*int(n*0.5) + [-1]*int(n*0.5))
     pattern = np.concatenate((classA, classB), axis=0)
-    # Adds ones for bias
-    if bias:
-        pattern = np.insert(pattern, 2, values=np.ones(n*2), axis=1)
+    pattern = np.insert(pattern, 2, values=np.ones(n*2), axis=1)
+
+    print("Patterns")
+    print(pattern)
 
     # Shuffles data
     s = np.arange(target.shape[0])
@@ -54,7 +56,6 @@ def accuracy(w, x, t):
     corr = 0
     x = x.T
     for i in range(len(t)):
-#        pred = np.dot(w[:2], x[i][:2])  # Don't take bias into consideration for threshold function
         pred = np.dot(w,x[i])             # Takes bias into account
         if pred > 0:
             predictions.append(1)
@@ -67,9 +68,9 @@ def accuracy(w, x, t):
     acc = corr / len(t)
     return acc
 
-def plot_learning_rate(list, type):
+def plot_learning_rate(list, string):
     plt.plot(range(len(list)),list, '-',label="Accuracy")
-    title='Accuracy for ' + type + ' learning'
+    title='Accuracy for ' + string + ' learning'
     plt.title(title)
     plt.grid()
     plt.legend()
@@ -95,7 +96,7 @@ def plot_sep_bound(w, x, t, title="Graph title"):
     plt.grid()
     plt.show()
 
-def main():
+def part2():
     l_rate = 0.0001
     e = 20
 
@@ -105,7 +106,7 @@ def main():
 
     print("Final accuracy for Delta rule, batch: " + str(accuracy(d_batch_w, p, t)))
     print(d_batch_w)
-    plot_sep_bound(d_batch_w, p, t, title="Separation boundary for Single Perceptron usning Delta rule")
+    plot_sep_bound(d_batch_w, p, t, title="Separation boundary for Single Perceptron using Delta rule")
 
     plt.plot(range(len(db_acc)), db_acc, '-', label="Batch Delta rule (%s)" % (accuracy(d_batch_w, p, t)))
     title = 'Learning curve  \n Learning rate = %s Epochs = %s' % (l_rate, e)
@@ -116,5 +117,20 @@ def main():
     plt.ylabel('Ratio of correct classifications', color='#1C2833')
     plt.show()
 
+def part1():
+    l_rate = 0.001
+    e = 20
+
+    acc = 0
+    for i in range(1):
+        p, t = generate_data(10)
+        w_rand = np.random.randn(3)  # Initializing weights
+        d1, d1_acc = delta_rule_batch(w_rand, p, t, epochs=e, learning_rate=l_rate)
+        a = accuracy(d1, p, t)
+        acc += a
+        plot_sep_bound(d1, p, t)
+    print(acc/100)
+
 if __name__ == "__main__":
-    main()
+    part1()
+    #part2()
