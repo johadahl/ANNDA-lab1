@@ -16,30 +16,19 @@ def generate_data(n = 100, specific=False):
         classA = np.concatenate((classA_x1, classA_x2), axis=1)
         classB = np.random.randn(n, 2) * sigmaB + mB
     else:
-        mA = [20, 20]
-        mB = [-2, -2]
+        mA = [0, 0]
+        mB = [1, 1]
         sigmaA = [1, 1]
-        sigmaB = [1, 1]
+        sigmaB = [2, 2]
         classA = np.random.randn(n, 2) * sigmaA + mA
         classB = np.random.randn(n, 2) * sigmaB + mB
 
-    print(classA)
-    print(classB)
-
     # Create X and T matrices
-    target = np.array([1]*int(n*0.5) + [-1]*int(n*0.5))
+    target = np.array([1]*n + [-1]*n)
     pattern = np.concatenate((classA, classB), axis=0)
     pattern = np.insert(pattern, 2, values=np.ones(n*2), axis=1)
 
-    print("Patterns")
-    print(pattern)
-
-    # Shuffles data
-    s = np.arange(target.shape[0])
-    np.random.shuffle(s)
-
-    return pattern[s].T, target[s]
-
+    return pattern.T, target
 
 def delta_rule_batch(w, x, t, epochs=20, learning_rate=0.0001):
     acc = []
@@ -77,18 +66,13 @@ def plot_learning_rate(list, string):
     plt.show()
 
 ## Plots separation boundary
-def plot_sep_bound(w, x, t, title="Graph title"):
+def plot_data(w, x, t, title="Graph title"):
     x = x.T
     for i in range(len(t)):
         if t[i] == -1:
             plt.plot(x[i][0], x[i][1], 'o', color='blue')
         else:
             plt.plot(x[i][0], x[i][1], 'x', color='red')
-
-    lin_x1 = np.linspace(-5, 5, 5)
-    lin_x2 = (-w[0]/w[1])*lin_x1 + w[2]/np.linalg.norm(w)
-
-    plt.plot(lin_x1, lin_x2, '-r', label='Separation Boundary')
     plt.title(title)
     plt.xlabel('x1', color='#1C2833')
     plt.ylabel('x2', color='#1C2833')
@@ -96,19 +80,153 @@ def plot_sep_bound(w, x, t, title="Graph title"):
     plt.grid()
     plt.show()
 
-def part2():
-    l_rate = 0.0001
+
+def perceptron_rule_batch(w, x, t, epochs=20, learning_rate=0.0001):
+    acc = []
+    x = x.T
+    for i in range(epochs):
+        delta_w = 0
+        for j in range(len(x)):
+            prediction = np.dot(w, x[j])  # w*X
+            if not (prediction < 0) == (t[j] < 0):
+                error = t[i] - prediction
+                delta_w += learning_rate * np.dot(error, np.transpose(x[j]))
+
+        w = w + delta_w
+        acc.append(accuracy(w, x.T, t))
+    return w, acc
+
+def delta_rule_seq(w, x, t, epochs=20, learning_rate=0.0001):
+    acc = []
+    x = x.T
+    for i in range(epochs):
+        for j in range(len(t)):
+            delta_w = -learning_rate*(np.dot((np.dot(w, x[j]) -t[j]), x[j].T))
+            w = w + delta_w
+        acc.append(accuracy(w, x.T, t))
+    return w, acc
+
+def split_25(patterns, targets):
+    patterns = patterns.T
+    targets = targets.T
+
+    n = int(len(targets)*0.5) # Number of datapoints per class
+    classA = patterns[:n]
+    classB = patterns[n:]
+    targetA = targets[:n]
+    targetB = targets[n:]
+
+    # Retrive a list of random indexes
+    row_i = np.random.choice(n, int(n*0.75), replace=False)
+
+    targetA_ss = []
+    targetB_ss = []
+    classA_ss = []
+    classB_ss = []
+    for i in row_i:
+        targetA_ss.append(targetA[i])
+        targetB_ss.append(targetB[i])
+        classA_ss.append(classA[i])
+        classB_ss.append(classB[i])
+
+    # Put subselections together
+    pattern = np.concatenate((classA_ss, classB_ss), axis=0)
+    target = np.concatenate((targetA_ss, targetB_ss), axis=0)
+
+    # Shuffles data
+    s = np.arange(target.shape[0])
+    np.random.shuffle(s)
+
+    return pattern[s].T, target[s].T
+
+def split_50(patterns, targets, classifier):
+    patterns = patterns.T
+    targets = targets.T
+
+    n = int(len(targets)*0.5) # Number of datapoints per class
+    classA = patterns[:n]
+    classB = patterns[n:]
+    targetA = targets[:n]
+    targetB = targets[n:]
+
+    # Retrive a list of random indexes
+    row_i = np.random.choice(n, int(n*0.5), replace=False)
+
+    if classifier == 1:
+        targetA_ss = []
+        classA_ss = []
+        for i in row_i:
+            targetA_ss.append(targetA[i])
+            classA_ss.append(classA[i])
+        targetB_ss = targetB
+        classB_ss = classB
+    else:
+        targetB_ss = []
+        classB_ss = []
+        for i in row_i:
+            targetB_ss.append(targetB[i])
+            classB_ss.append(classB[i])
+        targetA_ss = targetA
+        classA_ss = classA
+
+    # Put subselections together
+    pattern = np.concatenate((classA_ss, classB_ss), axis=0)
+    target = np.concatenate((targetA_ss, targetB_ss), axis=0)
+
+    # Shuffles data
+    s = np.arange(target.shape[0])
+    np.random.shuffle(s)
+
+    return pattern[s].T, target[s].T
+
+
+def part1():
+    learning_rate = [0.01, 0.001, 0.0001, 0.00001]
     e = 20
 
-    p, t = generate_data(100, specific=True)
+    for l_rate in learning_rate:
+        db_series = 0
+        ds_series = 0
+        pb_series = 0
+        for i in range(100):
+            p, t = generate_data(100)
+            w_rand = np.random.randn(3)  # Initializing weights
+            d_batch_w, db_acc = delta_rule_batch(w_rand, p, t, epochs=e, learning_rate=l_rate)
+            d_seq_w, ds_acc = delta_rule_seq(w_rand, p, t, epochs=e, learning_rate=l_rate)
+            p_batch_w, pb_acc = perceptron_rule_batch(w_rand, p, t, epochs=e, learning_rate=l_rate)
+            db_series += accuracy(d_batch_w, p, t)
+            ds_series += accuracy(d_seq_w, p, t)
+            pb_series += accuracy(p_batch_w, p, t)
+        print("%s || D-Batch: %s   || D-Seq: %s   || P-Batch: %s " % (l_rate, db_series/100, ds_series/100, pb_series/100))
+
+def part2_1():
+    l_rate = 0.0001
+    e = 20
+    p_all, t_all = generate_data(10, specific=True)
     w_rand = np.random.randn(3)  # Initializing weights
-    d_batch_w, db_acc = delta_rule_batch(w_rand, p, t, epochs=e, learning_rate=l_rate)
 
-    print("Final accuracy for Delta rule, batch: " + str(accuracy(d_batch_w, p, t)))
-    print(d_batch_w)
-    plot_sep_bound(d_batch_w, p, t, title="Separation boundary for Single Perceptron using Delta rule")
+    # Split up data
+    p_25, t_25 = split_25(p_all, t_all)
+    p_a, t_a = split_50(p_all, t_all, 1)
+    p_b, t_b = split_50(p_all, t_all, -1)
 
-    plt.plot(range(len(db_acc)), db_acc, '-', label="Batch Delta rule (%s)" % (accuracy(d_batch_w, p, t)))
+    d_all, db_acc_all = delta_rule_batch(w_rand, p_all, t_all, epochs=e, learning_rate=l_rate)
+    d_25, db_acc_25 = delta_rule_batch(w_rand, p_25, t_25, epochs=e, learning_rate=l_rate)
+    d_a, db_acc_a = delta_rule_batch(w_rand, p_a, t_a, epochs=e, learning_rate=l_rate)
+    d_b, db_acc_b = delta_rule_batch(w_rand, p_b, t_b, epochs=e, learning_rate=l_rate)
+
+    # Plot separation boundaries
+    plot_data(d_all, p_all, t_all, title="Separation boundary for SLP using Delta rule - All")
+    plot_data(d_25, p_25, t_25, title="Separation boundary for SLP using Delta rule, 25% from each class")
+    plot_data(d_a, p_a, t_a, title="Separation boundary for SLP using Delta rule, 50% from class A")
+    plot_data(d_b, p_b, t_b, title="Separation boundary for SLP using Delta rule, 50% from class B")
+
+    # Plot learning curves
+    plt.plot(range(len(db_acc_all)), db_acc_all, '-', label="All data (%s)" % (accuracy(d_all, p_all, t_all)))
+    plt.plot(range(len(db_acc_25)), db_acc_25, '-', label="data -0.25 each class (%s)" % (accuracy(d_all, p_all, t_all)))
+    plt.plot(range(len(db_acc_a)), db_acc_a, '-', label="data -0.5 class A (%s)" % (accuracy(d_all, p_all, t_all)))
+    plt.plot(range(len(db_acc_b)), db_acc_b, '-', label="data -0.5 class B (%s)" % (accuracy(d_all, p_all, t_all)))
+
     title = 'Learning curve  \n Learning rate = %s Epochs = %s' % (l_rate, e)
     plt.title(title)
     plt.grid()
@@ -117,20 +235,7 @@ def part2():
     plt.ylabel('Ratio of correct classifications', color='#1C2833')
     plt.show()
 
-def part1():
-    l_rate = 0.001
-    e = 20
-
-    acc = 0
-    for i in range(1):
-        p, t = generate_data(10)
-        w_rand = np.random.randn(3)  # Initializing weights
-        d1, d1_acc = delta_rule_batch(w_rand, p, t, epochs=e, learning_rate=l_rate)
-        a = accuracy(d1, p, t)
-        acc += a
-        plot_sep_bound(d1, p, t)
-    print(acc/100)
 
 if __name__ == "__main__":
-    part1()
-    #part2()
+    #part1()
+    part2_1()
