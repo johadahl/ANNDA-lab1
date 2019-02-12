@@ -28,7 +28,7 @@ def delta_rule_batch(w, x, t, epochs=20, learning_rate=0.0001):
     acc = []
     for i in range(epochs):
         delta_w = -learning_rate*(np.dot((np.dot(w, x) - t), x.T))
-        w = w + delta_w
+        w = w + delta_w/len(t)
         acc.append(accuracy(w, x, t))
     return w, acc
 
@@ -104,8 +104,27 @@ def plot_sep_bound(w, x, t, title="Graph title"):
     plt.grid()
     plt.show()
 
+def evaluate():
+    l_rate = 0.01
+    e = 20
+
+    db_series = 0
+    ds_series = 0
+    pb_series = 0
+    for i in range(100):
+        p, t = generate_data(100)
+        w_rand = np.random.randn(3)  # Initializing weights
+        d_batch_w, db_acc = delta_rule_batch(w_rand, p, t, epochs=e, learning_rate=l_rate)
+        d_seq_w, ds_acc = delta_rule_seq(w_rand, p, t, epochs=e, learning_rate=l_rate)
+        p_batch_w, pb_acc = perceptron_rule_batch(w_rand, p, t, epochs=e, learning_rate=l_rate)
+        db_series += accuracy(d_batch_w, p, t)
+        ds_series += accuracy(d_seq_w, p, t)
+        pb_series += accuracy(p_batch_w, p, t)
+
+    print("%s || D-Batch: %s   || D-Seq: %s   || P-Batch: %s " % (l_rate, db_series/100, ds_series/100, pb_series/100))
+
 def main():
-    l_rate = 0.0001
+    l_rate = 0.001
     e = 20
 
     p, t = generate_data(100)
@@ -120,34 +139,40 @@ def main():
     print(d_batch_w)
     print(d_seq_w)
     print(p_batch_w)
-    plot_sep_bound(p_batch_w, p, t, title="Separation boundary for Single Perceptron using perceptron rule")
-    plot_sep_bound(d_batch_w, p, t, title="Separation boundary for Single Perceptron usning Delta rule")
+#    plot_sep_bound(p_batch_w, p, t, title="Separation boundary for Single Perceptron using perceptron rule")
 
-    plt.plot(range(len(db_acc)), db_acc, '-', label="Batch Delta rule learning curve")
-    plt.plot(range(len(ds_acc)), ds_acc, '-', label="Sequential Delta rule learning curve")
-    plt.plot(range(len(pb_acc)), pb_acc, '-', label="Perceptron rule learning curve")
-    title = 'Learning curve depending on rule'
+    plt.plot(range(len(db_acc)), db_acc, '-', label="Batch Delta rule (%s)" % (accuracy(d_batch_w, p, t)))
+    plt.plot(range(len(ds_acc)), ds_acc, '-', label="Sequential Delta rule (%s)" % (accuracy(d_seq_w, p, t)))
+    plt.plot(range(len(pb_acc)), pb_acc, '-', label="Batch Perceptron rule (%s)" % (accuracy(p_batch_w, p, t)))
+    title = 'Learning curve depending on rule and training mode \n Learning rate = %s Epochs = %s' % (l_rate, e)
     plt.title(title)
     plt.grid()
     plt.legend()
+    plt.xlabel('Epoch', color='#1C2833')
+    plt.ylabel('Ratio of correct classifications', color='#1C2833')
     plt.show()
+    plot_sep_bound(d_batch_w, p, t, title="Separation boundary for Single-Layer Perceptron using Delta rule")
+
 
 def q3():
-    l_rate = 0.0001
+    l_rate = 0.01
     e = 20
 
-    p, t = generate_data(100, bias=False)
-    w_rand = np.random.randn(2)  # Initializing weights
-    d_batch_w, db_acc = delta_rule_batch(w_rand, p, t, epochs=e, learning_rate=l_rate)
-    print("Final accuracy for Delta rule, batch: " + str(accuracy(d_batch_w, p, t)))
-    print(d_batch_w)
-    plt.plot(range(len(db_acc)), db_acc, '-', label="Batch Delta rule learning curve")
-    title = 'Learning curve without bias'
+    for i in range(5):
+        p, t = generate_data(100, bias=False)
+        w_rand = np.random.randn(2)  # Initializing weights
+        d1, d1_acc = delta_rule_batch(w_rand, p, t, epochs=e, learning_rate=l_rate)
+        print("Final accuracy for Delta rule, batch: " + str(accuracy(d1, p, t)))
+        print(d1)
+        plt.plot(range(len(d1_acc)), d1_acc, '-', label="Batch Delta rule run %s (%s)" % (i, accuracy(d1, p, t)))
+
+    title = 'Learning curve without bias '
     plt.title(title)
     plt.grid()
     plt.legend()
     plt.show()
 
 if __name__ == "__main__":
-    main()
+    #main()
     #q3()
+    evaluate()

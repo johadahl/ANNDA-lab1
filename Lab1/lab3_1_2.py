@@ -2,20 +2,28 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 ## Generates two classes of data
-def generate_data(n = 100, bias=True, specific=True):
+def generate_data(n = 100, bias=True, specific=False):
     if specific:
-        mA = [2, 2]
-        mB = [-2, -2]
-        sigmaA = [2, 2]
-        sigmaB = [2, 2]
-    else:
         mA = [1, 0.3]
         mB = [0, -0.1]
         sigmaA = [0.2, 0.2]
         sigmaB = [0.3, 0.3]
 
-    classA = np.random.randn(int(0.5*n), 2)*sigmaA + mA
-    classB = np.random.randn(int(0.5*n), 2)*sigmaB + mB
+        classA_x1_1 = np.random.randn(int(0.5*n), 1) * sigmaA[0] - mA[0]
+        classA_x1_2 = np.random.randn(int(0.5*n), 1) * sigmaA[0] + mA[0]
+        classA_x1 = np.concatenate((classA_x1_1, classA_x1_2), axis=0)
+        classA_x2 = np.random.randn(n, 1) * sigmaA[1] + mA[1]
+        classA = np.concatenate((classA_x1, classA_x2), axis=1)
+        classB = np.random.randn(n, 2) * sigmaB + mB
+    else:
+        mA = [2, 2]
+        mB = [-2, -2]
+        sigmaA = [2, 2]
+        sigmaB = [2, 2]
+
+        classA = np.random.randn(n, 2) * sigmaA + mA
+        classB = np.random.randn(n, 2) * sigmaB + mB
+
 
     # Create X and T matrices
     target = np.array([1]*int(n*0.5) + [-1]*int(n*0.5))
@@ -76,7 +84,7 @@ def plot_sep_bound(w, x, t, title="Graph title"):
         else:
             plt.plot(x[i][0], x[i][1], 'x', color='red')
 
-    lin_x1 = np.linspace(-10, 10, 2)
+    lin_x1 = np.linspace(-5, 5, 5)
     lin_x2 = (-w[0]/w[1])*lin_x1 + w[2]/np.linalg.norm(w)
 
     plt.plot(lin_x1, lin_x2, '-r', label='Separation Boundary')
@@ -91,7 +99,7 @@ def main():
     l_rate = 0.0001
     e = 20
 
-    p, t = generate_data(100)
+    p, t = generate_data(100, specific=True)
     w_rand = np.random.randn(3)  # Initializing weights
     d_batch_w, db_acc = delta_rule_batch(w_rand, p, t, epochs=e, learning_rate=l_rate)
 
@@ -99,11 +107,13 @@ def main():
     print(d_batch_w)
     plot_sep_bound(d_batch_w, p, t, title="Separation boundary for Single Perceptron usning Delta rule")
 
-    plt.plot(range(len(db_acc)), db_acc, '-', label="Batch Delta rule learning curve")
-    title = 'Learning curve for non-linear separable data'
+    plt.plot(range(len(db_acc)), db_acc, '-', label="Batch Delta rule (%s)" % (accuracy(d_batch_w, p, t)))
+    title = 'Learning curve  \n Learning rate = %s Epochs = %s' % (l_rate, e)
     plt.title(title)
     plt.grid()
     plt.legend()
+    plt.xlabel('Epoch', color='#1C2833')
+    plt.ylabel('Ratio of correct classifications', color='#1C2833')
     plt.show()
 
 if __name__ == "__main__":
