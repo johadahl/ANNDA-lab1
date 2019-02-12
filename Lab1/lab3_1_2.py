@@ -72,7 +72,13 @@ def plot_data(w, x, t, title="Graph title"):
         if t[i] == -1:
             plt.plot(x[i][0], x[i][1], 'o', color='blue')
         else:
-            plt.plot(x[i][0], x[i][1], 'x', color='red')
+            plt.plot(x[i][0], x[i][1], 'x', color='orange')
+
+    lin_x1 = np.linspace(-5, 5, 3)
+    lin_x2 = (-w[0]/w[1])*lin_x1 + w[2]/np.linalg.norm(w)
+
+    plt.plot(lin_x1, lin_x2, '-r', label='Separation Boundary')
+
     plt.title(title)
     plt.xlabel('x1', color='#1C2833')
     plt.ylabel('x2', color='#1C2833')
@@ -179,6 +185,100 @@ def split_50(patterns, targets, classifier):
 
     return pattern[s].T, target[s].T
 
+def split_special(patterns, targets):
+    patterns = patterns.T
+    targets = targets.T
+
+    n = int(len(targets)*0.5) # Number of datapoints per class
+    classA = patterns[:n]
+    classB = patterns[n:]
+    targetA = targets[:n]
+    targetB = targets[n:]
+
+    a_div = int(n*0.5)  # Number of datapoints lower or greater than 0
+    classA_low = classA[:a_div]     # All points where classA x1 < 0
+    classA_high = classA[a_div:]    # All points where classA x1 > 0
+
+    # Retrive a list of random indexes to subselect with
+    low_i = np.random.choice(a_div, int(a_div*0.8), replace=False)
+    high_i = np.random.choice(a_div, int(a_div*0.2), replace=False)
+
+    classA_low_ss = []
+    for i in low_i:
+        classA_low_ss.append(classA_low[i])
+
+    classA_high_ss = []
+    for i in high_i:
+        classA_high_ss.append(classA_high[i])
+
+    # Adjust number of targets to class A
+    n_remaining = int(a_div*0.8) + int(a_div*0.2)
+    targetA_ss = targetA[:n_remaining]
+
+    # Put subselections together
+    classA_ss = np.concatenate((classA_low_ss, classA_high_ss), axis=0)
+    pattern = np.concatenate((classA_ss, classB), axis=0)
+    target = np.concatenate((targetA_ss, targetB), axis=0)
+
+    # Shuffles data
+    s = np.arange(target.shape[0])
+    np.random.shuffle(s)
+
+    return pattern[s].T, target[s].T
+
+def plot_sep_bound(w_all, w_list, patterns, targets):
+    x = patterns.T
+    for i in range(len(targets)):
+        if targets[i] == -1:
+            plt.plot(x[i][0], x[i][1], 'o', color='blue')
+        else:
+            plt.plot(x[i][0], x[i][1], 'x', color='orange')
+
+    lin_x1 = np.linspace(-3, 3, 2)
+    lin_x2 = (-w_all[0]/w_all[1])*lin_x1 + w_all[2]/np.linalg.norm(w_all)
+    plt.plot(lin_x1, lin_x2, '-', label="All data")
+
+    for i in range(len(w_list)):
+        w = w_list[i]
+        lin_x1 = np.linspace(-3, 3, 2)
+        lin_x2 = (-w[0]/w[1])*lin_x1 + w[2]/np.linalg.norm(w)
+        plt.plot(lin_x1, lin_x2, '-', label="Subset %s" %(i+1))
+
+    plt.title("Separation bounds for different subsets")
+    plt.xlabel('x1', color='#1C2833')
+    plt.ylabel('x2', color='#1C2833')
+    plt.legend(loc='lower left')
+    plt.grid()
+    plt.show()
+
+def accuracy_2(w, x, t):
+    classA = 0
+    classB = 0
+    classA_corr = 0
+    classB_corr = 0
+    predictions = []
+    corr = 0
+    x = x.T
+    for i in range(len(t)):
+        pred = np.dot(w,x[i])             # Takes bias into account
+        if pred > 0:
+            predictions.append(1)
+        else:
+            predictions.append(-1)
+    for i in range(len(t)):
+        if t[i] == 1:
+            classA += 1
+            if predictions[i] == 1: classA_corr += 1
+        else:
+            classB += 1
+            if predictions[i] == -1: classB_corr += 1
+    print(classA)
+    print(classA_corr)
+    A_acc = (int(classA_corr/classA*100))/100
+    B_acc = (int(classB_corr/classB*100))/100
+    print(A_acc)
+    return "[" + str(A_acc) + " | " + str(B_acc) + "]"
+
 
 def part1():
     learning_rate = [0.01, 0.001, 0.0001, 0.00001]
@@ -202,38 +302,61 @@ def part1():
 def part2_1():
     l_rate = 0.0001
     e = 20
-    p_all, t_all = generate_data(10, specific=True)
+    p_all, t_all = generate_data(1000, specific=True)
     w_rand = np.random.randn(3)  # Initializing weights
 
     # Split up data
     p_25, t_25 = split_25(p_all, t_all)
     p_a, t_a = split_50(p_all, t_all, 1)
     p_b, t_b = split_50(p_all, t_all, -1)
+    p_special, t_special = split_special(p_all, t_all)
 
+    # Trains different models using delta rule batch mode
     d_all, db_acc_all = delta_rule_batch(w_rand, p_all, t_all, epochs=e, learning_rate=l_rate)
     d_25, db_acc_25 = delta_rule_batch(w_rand, p_25, t_25, epochs=e, learning_rate=l_rate)
     d_a, db_acc_a = delta_rule_batch(w_rand, p_a, t_a, epochs=e, learning_rate=l_rate)
     d_b, db_acc_b = delta_rule_batch(w_rand, p_b, t_b, epochs=e, learning_rate=l_rate)
+    d_special, db_acc_special = delta_rule_batch(w_rand, p_b, t_b, epochs=e, learning_rate=l_rate)
+
+    # Trains different models using perceptron rule batch mode
+    pb_all, pb_acc_all = perceptron_rule_batch(w_rand, p_all, t_all, epochs=e, learning_rate=l_rate)
+    pb_25, pb_acc_25 = perceptron_rule_batch(w_rand, p_25, t_25, epochs=e, learning_rate=l_rate)
+    pb_a, pb_acc_a = perceptron_rule_batch(w_rand, p_a, t_a, epochs=e, learning_rate=l_rate)
+    pb_b, pb_acc_b = perceptron_rule_batch(w_rand, p_b, t_b, epochs=e, learning_rate=l_rate)
+    pb_special, pb_acc_special = perceptron_rule_batch(w_rand, p_special, t_special, epochs=e, learning_rate=l_rate)
+
 
     # Plot separation boundaries
-    plot_data(d_all, p_all, t_all, title="Separation boundary for SLP using Delta rule - All")
-    plot_data(d_25, p_25, t_25, title="Separation boundary for SLP using Delta rule, 25% from each class")
-    plot_data(d_a, p_a, t_a, title="Separation boundary for SLP using Delta rule, 50% from class A")
-    plot_data(d_b, p_b, t_b, title="Separation boundary for SLP using Delta rule, 50% from class B")
+#    plot_data(d_all, p_all, t_all, title="Separation boundary for SLP using Delta rule - All")
+#    plot_data(d_25, p_25, t_25, title="Separation boundary for SLP using Delta rule, subset 1")
+#    plot_data(d_a, p_a, t_a, title="Separation boundary for SLP using Delta rule, subset 2")
+#    plot_data(d_b, p_b, t_b, title="Separation boundary for SLP using Delta rule, subset 3")
+    w_list = [d_25, d_a, d_b, d_special]
 
-    # Plot learning curves
-    plt.plot(range(len(db_acc_all)), db_acc_all, '-', label="All data (%s)" % (accuracy(d_all, p_all, t_all)))
-    plt.plot(range(len(db_acc_25)), db_acc_25, '-', label="data -0.25 each class (%s)" % (accuracy(d_all, p_all, t_all)))
-    plt.plot(range(len(db_acc_a)), db_acc_a, '-', label="data -0.5 class A (%s)" % (accuracy(d_all, p_all, t_all)))
-    plt.plot(range(len(db_acc_b)), db_acc_b, '-', label="data -0.5 class B (%s)" % (accuracy(d_all, p_all, t_all)))
+    # Plot learning curves for batch delta rule
+#    plt.plot(range(len(db_acc_all)), db_acc_all, '-', label="All data (%s)" % ((int(accuracy(d_all, p_all, t_all)*100)/100)))
+#    plt.plot(range(len(db_acc_25)), db_acc_25, '-', label="Subset 1 (%s)" % ((int(accuracy(d_25, p_25, t_25)*100)/100)))
+#    plt.plot(range(len(db_acc_a)), db_acc_a, '-', label="Subset 2 %s" % (accuracy_2(d_a, p_a, t_a)))
+#    plt.plot(range(len(db_acc_b)), db_acc_b, '-', label="Subset 3 %s" % (accuracy_2(d_b, p_b, t_b)))
+#    plt.plot(range(len(db_acc_special)), db_acc_special, '-', label="Subset 4 %s" % (accuracy_2(d_special, p_special, t_special)))
 
-    title = 'Learning curve  \n Learning rate = %s Epochs = %s' % (l_rate, e)
+    # Plot learning curves for batch delta rule
+    plt.plot(range(len(pb_acc_all)), pb_acc_all, '-', label="PB All data (%s)" % ((int(accuracy(pb_all, p_all, t_all)*100)/100)))
+    plt.plot(range(len(pb_acc_25)), pb_acc_25, '-', label="PB Subset 1 (%s)" % ((int(accuracy(pb_25, p_25, t_25)*100)/100)))
+    plt.plot(range(len(pb_acc_a)), pb_acc_a, '-', label="PB Subset 2 %s" % (accuracy_2(pb_a, p_a, t_a)))
+    plt.plot(range(len(pb_acc_b)), pb_acc_b, '-', label="PB Subset 3 %s" % (accuracy_2(pb_b, p_b, t_b)))
+    plt.plot(range(len(pb_acc_special)), pb_acc_special, '-', label="PB Subset 4 %s" % (accuracy_2(pb_special, p_special, t_special)))
+
+    title = 'Learning curve Perceptron rule  \n Learning rate = %s Epochs = %s' % (l_rate, e)
     plt.title(title)
     plt.grid()
     plt.legend()
     plt.xlabel('Epoch', color='#1C2833')
     plt.ylabel('Ratio of correct classifications', color='#1C2833')
     plt.show()
+
+#    plot_sep_bound(d_all, w_list, p_all, t_all)
+#    plot_data(d_special, p_special, t_special, title="Separation boundary for SLP using Delta rule \n n = 1000, Subset 4")
 
 
 if __name__ == "__main__":
