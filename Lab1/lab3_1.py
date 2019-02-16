@@ -38,7 +38,7 @@ def delta_rule_seq(w, x, t, epochs=20, learning_rate=0.0001):
     for i in range(epochs):
         for j in range(len(t)):
             delta_w = -learning_rate*(np.dot((np.dot(w, x[j]) -t[j]), x[j].T))
-            w = w + delta_w
+            w += delta_w
         acc.append(accuracy(w, x.T, t))
     return w, acc
 
@@ -113,7 +113,7 @@ def evaluate_learning_rates():
         ds_series = 0
         pb_series = 0
         for i in range(100):
-            p, t = generate_data(100)
+            p, t = generate_data(1000)
             w_rand = np.random.randn(3)  # Initializing weights
             d_batch_w, db_acc = delta_rule_batch(w_rand, p, t, epochs=e, learning_rate=l_rate)
             d_seq_w, ds_acc = delta_rule_seq(w_rand, p, t, epochs=e, learning_rate=l_rate)
@@ -121,13 +121,13 @@ def evaluate_learning_rates():
             db_series += accuracy(d_batch_w, p, t)
             ds_series += accuracy(d_seq_w, p, t)
             pb_series += accuracy(p_batch_w, p, t)
-        print("%s || D-Batch: %s   || D-Seq: %s   || P-Batch: %s " % (l_rate, db_series/100, ds_series/100, pb_series/100))
+        print("%s | D-Batch: %s | D-Seq: %s | P-Batch: %s " % (l_rate, db_series/100, ds_series/100, pb_series/100))
 
 def main():
-    l_rate = 0.001
+    l_rate = 0.0001
     e = 20
 
-    p, t = generate_data(100)
+    p, t = generate_data(500)
     w_rand = np.random.randn(3)  # Initializing weights
     d_batch_w, db_acc = delta_rule_batch(w_rand, p, t, epochs=e, learning_rate=l_rate)
     d_seq_w, ds_acc = delta_rule_seq(w_rand, p, t, epochs=e, learning_rate=l_rate)
@@ -151,7 +151,7 @@ def main():
     plt.xlabel('Epoch', color='#1C2833')
     plt.ylabel('Ratio of correct classifications', color='#1C2833')
     plt.show()
-    plot_sep_bound(d_batch_w, p, t, title="Separation boundary for Single-Layer Perceptron using Delta rule")
+    #plot_sep_bound(d_batch_w, p, t, title="Separation boundary for Single-Layer Perceptron using Delta rule")
 
 
 def q3():
