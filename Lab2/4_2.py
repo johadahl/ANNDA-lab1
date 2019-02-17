@@ -17,6 +17,7 @@ def similarity(indata, weights):
         if sim < winner:
             winner = sim
             winnerNode = i
+    print(winnerNode)
     return winnerNode
 
 
@@ -46,12 +47,13 @@ def updateWeights(weights, weightIndex, ind, eta=0.2):
 def trainSOM(indata, weights, epochs=20):
     size = 2  # Size of neighbourhood
 
-
     for epoch in range(epochs):  # 20 is standard
         # For each pattern in indata
         for i in range(indata.shape[0]):
             winnerNode = similarity(indata[i], weights)  # Find best node
             getNeighbours(weights, size, winnerNode, indata[i])  # Get list of neighbours with winnerNode in center
+        plt.plot(weights[:, 0], weights[:, 1], linestyle='-', marker='x', color='r')
+        plt.show()
 
         # Update size of neighbourhood
         if epochs < 15:
@@ -66,13 +68,15 @@ def predictSOM(indata, weights):
     # Loop through animals
     for i in range(indata.shape[0]):
         winnerNode = similarity(indata[i], weights)  # Find best node
+        print(winnerNode)
         pos.append([winnerNode, indata[i][0], indata[i][1]])
 
     pos = np.array(pos, dtype=object)
-    pos = pos[pos[:, 0].argsort()]
-    print(pos)
 
+    pos = pos[pos[:, 0].argsort()]
+    print(weights)
     # for i in range(pos.shape[0]):
+    plt.plot(weights[:, 0], weights[:, 1], linestyle='-', marker='x', color='r')
     plt.plot(pos[:, 1], pos[:, 2], linestyle='-', marker='o', color="b")
     # path = Path(pos[:,1:])
     # plt.plot(path) #spara denna
@@ -82,7 +86,8 @@ def predictSOM(indata, weights):
 def main():
     indata = np.loadtxt('./data_lab2/cities.dat', delimiter=",", skiprows=4, dtype=str)
     weights = init_weights()
-
+    plt.plot(weights[:, 0], weights[:, 1], linestyle='-', marker='x', color='r')
+    plt.show()
     for i in range(indata.shape[0]):
         # row = row.strip(";")
         indata[i][1] = indata[i][1].strip(";")
