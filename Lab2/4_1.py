@@ -19,30 +19,34 @@ def similarity(indata, weights):
 
 # Takes the index of the winner node, uses the window to call update weight function for
 # appropriate neighbours
-def getNeighbours(weights, size, winner, ind):
+def getNeighbours(weights, size, winner_index, ind):
     left = []
     right = []
 
-    for i in range(size - 1):
-        tmp = (winner - i) % 100
-        left.append(tmp)
+    add = range(1, size+1)
+    for val in add:
+        rgt = winner_index + val
+        if rgt < 100:
+            right.append(rgt)
 
-    for i in range(size):
-        tmp = (winner + i) % 100
-        right.append(tmp)
+    subtract = range(-size, 0)
+    for val in subtract:
+        lft = winner_index + val
+        if lft >= 0:
+            left.append(lft)
 
     left = np.array(left)
     right = np.array(right)
 
-    updateWeights(weights, left, ind)
-    updateWeights(weights, right, ind)
-
+    if left.size != 0:
+        updateWeights(weights, left, ind)
+    if right.size != 0:
+        updateWeights(weights, right, ind)
 
 # Updates weight W[i]
-def updateWeights(weights, weightIndex, ind, eta=0.2):
-    for i in np.nditer(weightIndex):
+def updateWeights(weights, weight_index, ind, eta=0.2):
+    for i in np.nditer(weight_index):
         weights[i] = weights[i] + eta * (np.subtract(ind, weights[i]))
-
 
 # Trains a SOM
 def trainSOM(indata, weights, epochs=20):
@@ -72,7 +76,10 @@ def predictSOM(indata, weights, animal_names):
         pos.append([winnerNode, animal_names[i]])
 
     pos = np.array(pos, dtype=object)
-    print(pos[pos[:, 0].argsort()])
+    a = pos[pos[:, 0].argsort()]
+    for i in a:
+        print(str(i[0]) + ", " + i[1] + ", ")
+
 
 def main():
 
@@ -92,6 +99,15 @@ def main():
 
     # Visualize this later
 
+def eval():
+    same = 0
+    bat = [0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,0,0,1,0,0,0,1,0,0,1,0,0,0,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0,1,0,0,0,0]
+    el = [0,0,0,0,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,1,0,0,0,1,0,0,1,0,0,0,1,1,0,0,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,1,0,0,1,0,1,0,0,0,0,0,0]
+    for i in range(len(bat)):
+        if bat[i] == el[i]:
+            same += 1
+    print(same)
 
 if __name__ == '__main__':
-    main()
+#    main()
+    eval()
