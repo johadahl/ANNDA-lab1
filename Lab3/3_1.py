@@ -10,7 +10,7 @@ class hebbian:
 		print("An update")
 		self.patterns.append(x)
 		self.weights = np.add(self.weights, np.outer(x.T, x))
-		np.fill_diagonal(self.weights, 0)		# Reset diagonals to 0
+#		np.fill_diagonal(self.weights, 0)		# Reset diagonals to 0
 
 	def check_True(self, prediction):
 		solved = False
@@ -25,7 +25,9 @@ class hebbian:
 		count = 0
 
 		previousPattern = np.zeros(dim)
-		while True:
+		old = []
+		cont = True
+		while cont:
 			out = np.zeros(dim)
 			for i in range(dim):
 				s = 0
@@ -39,26 +41,24 @@ class hebbian:
 					sign = -1
 				out[i] = sign
 			x = out		# New updated pattern
+			old.insert(0, previousPattern)
 
 			if self.check_True(x):
 				print("It took:", count, "nr of iterations")
-				break
+				cont = False
 
 			elif np.array_equal(x, previousPattern):
 				print("Local minimum found in iteration:", count)
 				print(x)
-				break
-
-			print("Iteration")
-			print(previousPattern)
-			print(x)
-			if count == 0:
-				break
+				cont = False
+			# If stuck in an endless oscillating loop
+			elif count > 100:
+				for i in range(3):
+					if np.array_equal(x, old[i]):
+						print("Updated pattern %s similar to old %s after %s" % (x, old[i], count))
+						cont = False
 			previousPattern = x
 			count += 1
-
-
-
 
 def main():
 	x1 = np.array([-1, -1, 1, -1, 1, -1, -1, 1])
@@ -85,6 +85,8 @@ def main():
 	h.update_rule(x2d)
 	print("\nGuess")
 	h.update_rule(x3d)
+
+	
 
 if __name__ == '__main__':
 	main()
