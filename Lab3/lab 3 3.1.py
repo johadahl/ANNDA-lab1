@@ -1,10 +1,4 @@
 import numpy as np
-import random, math
-import matplotlib.pyplot as plt
-from matplotlib import cm
-from scipy import signal
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
 np.random.seed(42)
 
 x1 = np.array([-1, -1, 1, -1, 1, -1, -1, 1])
@@ -26,8 +20,7 @@ def weightMatrix(patterns):
 
 def checkConvergence():
 	while True:
-
-	updateRule()
+		updateRule()
 
 def updateRule(W, pattern):
 	dim = pattern.size
