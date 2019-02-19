@@ -10,7 +10,7 @@ class hebbian:
 		print("An update")
 		self.patterns.append(x)
 		self.weights = np.add(self.weights, np.outer(x.T, x))
-#		np.fill_diagonal(self.weights, 0)		# Reset diagonals to 0
+		np.fill_diagonal(self.weights, 0)		# Reset diagonals to 0
 
 	def check_True(self, prediction):
 		solved = False
@@ -52,10 +52,10 @@ class hebbian:
 				print(x)
 				cont = False
 			# If stuck in an endless oscillating loop
-			elif count > 100:
+			if count >= 3:
 				for i in range(3):
 					if np.array_equal(x, old[i]):
-						print("Updated pattern %s similar to old %s after %s" % (x, old[i], count))
+						print("Updated pattern   %s \nsimilar to old    %s after %s iterations " % (x, old[i], count))
 						cont = False
 			previousPattern = x
 			count += 1
@@ -86,7 +86,7 @@ def main():
 	print("\nGuess")
 	h.update_rule(x3d)
 
-	
+
 
 if __name__ == '__main__':
 	main()

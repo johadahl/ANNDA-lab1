@@ -24,25 +24,22 @@ def calc_energy(pattern, w):
     """
     return -enrg
 
-
 def recall(pattern, w):
+    np.fill_diagonal(w, 0)  # Reset diagonals to 0
     dim = pattern.size
     count = 0
     energyLevels = []
 
     previousPattern = np.zeros(dim)
     while True:
-
         s = np.dot(w, pattern)
         s[s >= 0] = 1
         s[s < 0] = -1
 
         pattern = s
-
         count += 1
 
         energyLevels.append(calc_energy(pattern, w))
-
         # print("Energy: ", calc_energy(pattern,w))
 
         if check_True(pattern):
@@ -52,7 +49,7 @@ def recall(pattern, w):
             break
 
         elif np.array_equal(pattern, previousPattern):
-            print("Local minimum found in iteration:", count)
+            print("Local minimum found %s iterations" % (count))
             plt.imshow(pattern.reshape(32, 32), interpolation="nearest")
             plt.show()
             break
@@ -61,8 +58,8 @@ def recall(pattern, w):
         if count == 50:
             break
 
-    plt.plot(range(len(energyLevels)), energyLevels)
-    plt.show()
+#    plt.plot(range(len(energyLevels)), energyLevels)
+#    plt.show()
     # print(energyLevels)
 
 
@@ -84,7 +81,6 @@ def random_recall(pattern, w):
 
     while True:
         i = np.random.randint(0, dim)
-
         p = np.dot(w[i], pattern.T)
         print("Här e P:", p)
 
@@ -135,30 +131,60 @@ def genStartingState(w):
         s = 0
         for j in range(dim):
             s += w[i][j] * out[j]
-
         if s >= 0:
             sign = 1
         else:
             sign = -1
-
         out[i] = sign
 
     plt.imshow(out.reshape(32, 32), interpolation="nearest")
     plt.show()
 
+def bullet_1():
+    recall(data[0], w)
+    recall(data[1], w)
+    recall(data[2], w)
+
+def bullet_2():
+    # Should match p1
+    plt.imshow(data[9].reshape(32, 32), interpolation="nearest")
+    plt.show()
+    print("Start p1")
+    recall(data[9], w)
+    # Should match p2
+    print("Start p2")
+    plt.imshow(data[10].reshape(32, 32), interpolation="nearest")
+    plt.show()
+    recall(data[10], w)
+
+
+def bullet_3():
+    r = np.random.randn(1024)
+    for i in range(r.size):
+        if r[i] >= 0:
+            r[i] = 1
+        else:
+            r[i] = -1
+    recall(r, w)
 
 data = np.loadtxt('./pict.dat', delimiter=",", dtype=int).reshape(-1, 1024)
-plt.imshow(data[10].reshape(32,32),interpolation="nearest")
-plt.show()
 
-w = init_weights(data[0:3,:])
+# Init & trains model on p1, p2, p3
 patterns = data[0:3,:]
-recall(data[10],w)
-#recall(data[10])
-#recall(data[2])
+w = init_weights(patterns)
+print("Weights trained")
+
+# Bulletpoint 1 - Test if stable
+#bullet_1()
+
+# Bulletpoint 2 - Can the network complete a degraded pattern?
+#bullet_2()
+
+# Bulletpoint 3 - Testing random data
+bullet_3()
 
 
-patterns = data[0:3,:] #Decide on what patterns you want to match against
+quit()
 random_recall(data[0],w)
 
 w = genRandWeights(patterns[0:3, :])
