@@ -4,48 +4,87 @@ import numpy as np
 class hebbian:
 	def __init__(self, size):
 		self.weights = np.zeros((size,size))
+		self.patterns = []	# Array with stored patterns
 
-	def updateWeights(self, x):
+	def update_weights(self, x):
 		print("An update")
-		print(np.dot(x.T, x))
-		self.weights += np.dot(x.T, x)
+		self.patterns.append(x)
+		self.weights = np.add(self.weights, np.outer(x.T, x))
+		np.fill_diagonal(self.weights, 0)		# Reset diagonals to 0
 
-	def recall(self, x):
-		guess = np.dot(self.weights, x.T)
-		j = 0
-		for i in guess:
-			if i<0:
-				guess[j] = -1
-			else:
-				guess[j] = 1
-			j = j + 1
-		return guess
+	def check_True(self, prediction):
+		solved = False
+		for i in range(len(self.patterns)):
+			if np.array_equal(self.patterns[i], prediction):
+				print("Pattern matches stored pattern nr:", i + 1)
+				solved = True
+		return solved
+
+	def update_rule(self, x):
+		dim = x.size
+		count = 0
+
+		previousPattern = np.zeros(dim)
+		while True:
+			out = np.zeros(dim)
+			for i in range(dim):
+				s = 0
+				for j in range(dim):
+					w = self.weights[i][j]
+					x_j = x[j]
+					s += w*x_j
+				if s >= 0:
+					sign = 1
+				else:
+					sign = -1
+				out[i] = sign
+			x = out		# New updated pattern
+
+			if self.check_True(x):
+				print("It took:", count, "nr of iterations")
+				break
+
+			elif np.array_equal(x, previousPattern):
+				print("Local minimum found in iteration:", count)
+				print(x)
+				break
+
+			print("Iteration")
+			print(previousPattern)
+			print(x)
+			if count == 0:
+				break
+			previousPattern = x
+			count += 1
 
 
-if __name__ == '__main__':
-    x1 = np.array([-1, -1, 1, -1, 1, -1, -1, 1])
-    x2 = np.array([-1, -1, -1, -1, -1, 1, -1, - 1])
-    x3 = np.array([-1, 1, 1, -1, -1, 1, -1, 1])
 
-    x1d = np.array([(1,-1,1,-1,1,-1,-1,1)])
-    x2d = np.array([(1,1,-1,-1,-1,1,-1,-1)])
-    x3d = np.array([(1,1,1,-1,1,1,-1,1)])
+
+def main():
+	x1 = np.array([-1, -1, 1, -1, 1, -1, -1, 1])
+	x2 = np.array([-1, -1, -1, -1, -1, 1, -1, -1])
+	x3 = np.array([-1, 1, 1, -1, -1, 1, -1, 1])
+
+	x1d = np.array([1, -1, 1, -1, 1, -1, -1, 1])
+	x2d = np.array([1, 1, -1, -1, -1, 1, -1, -1])
+	x3d = np.array([1, 1, 1, -1, 1, 1, -1, 1])
 
 	# initiate the hebbian class
-	hebbian = hebbian(x1.size)
+	h = hebbian(x1.size)
 
 	# Update the weight matrix with all three inputs
-	hebbian.updateWeights(x1)
-	hebbian.updateWeights(x2)
-	hebbian.updateWeights(x3)
+	h.update_weights(x1)
+	h.update_weights(x2)
+	h.update_weights(x3)
+	print(h.weights)
 
 	# Check if the sign function can reproduce the right inputs
 	print("\nGuess")
-	guess = hebbian.recall(x1d)
-	print(guess.T)
+	h.update_rule(x1d)
 	print("\nGuess")
-	guess = hebbian.recall(x2d)
-	print(guess.T)
+	h.update_rule(x2d)
 	print("\nGuess")
-	guess = hebbian.recall(x3d)
-	print(guess.T)
+	h.update_rule(x3d)
+
+if __name__ == '__main__':
+	main()
