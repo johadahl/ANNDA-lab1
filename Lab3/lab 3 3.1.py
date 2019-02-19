@@ -5,6 +5,11 @@ x1 = np.array([-1, -1, 1, -1, 1, -1, -1, 1])
 x2 = np.array([-1, -1, -1, -1, -1, 1, -1, -1])
 x3 = np.array([-1, 1, 1, -1, -1, 1, -1, 1])
 
+
+x1d = np.array([1, -1, 1, -1, 1, -1, -1, 1])
+x2d = np.array([1, 1, -1, -1, -1, 1, -1, -1])
+x3d = np.array([1, 1, 1, -1, 1, 1, -1, 1])
+
 patterns = np.array([x1, x2, x3])
 
 def weightMatrix(patterns):
@@ -18,9 +23,22 @@ def weightMatrix(patterns):
 			W[i][j] = s
 	return W
 
-def checkConvergence():
+def checkConvergence(W, pattern):
+	numIterations = 0
+	previousPattern = np.zeros(pattern.size)
 	while True:
-		updateRule()
+		res = updateRule(W, pattern)
+		pattern = res
+		if checkIfTrue(res):
+			print("It took: ", numIterations, "number of iterations.")
+			break
+		elif np.array_equal(pattern, previousPattern):
+			print("------------------")
+			print("Local minima found in iteration: ", numIterations)
+			print("Pattern: ", pattern)
+			break
+		previousPattern = pattern
+		numIterations += 1
 
 def updateRule(W, pattern):
 	dim = pattern.size
@@ -36,7 +54,7 @@ def updateRule(W, pattern):
 def checkIfTrue(pattern):
 	for i in range(patterns.shape[0]):
 		if np.array_equal(pattern, patterns[i]):
-			print("Match!")
+			print("-------")
 			print("Matched with x", i+1, "!")
 			return True
 	return False
@@ -54,12 +72,13 @@ if __name__ == '__main__':
 	returnedPattern = updateRule(W, x1)
 	returnedPattern2 = updateRule(W, x2)
 	returnedPattern3 = updateRule(W, x3)
-	checkIfTrue(returnedPattern3)
-	checkIfTrue(returnedPattern2)
-	checkIfTrue(returnedPattern)
-	#checkIfTrue(patterns)
+	#checkIfTrue(returnedPattern3)
+	#checkIfTrue(returnedPattern2)
+	#checkIfTrue(returnedPattern)
 
-
+	checkConvergence(W, x1d)
+	checkConvergence(W, x2d)
+	checkConvergence(W, x3d)
 	"""
 
 	plt.plot(range(len(testError)), testError, label = "test error")
