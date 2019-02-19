@@ -5,6 +5,7 @@ class hebbian:
 	def __init__(self, size):
 		self.weights = np.zeros((size,size))
 
+
 	def updateWeights(self, x):
 		print("An update")
 		print(np.dot(x.T, x))
@@ -20,6 +21,7 @@ class hebbian:
 				guess[j] = 1
 			j = j + 1
 		return guess
+
 
 
 if __name__ == '__main__':
