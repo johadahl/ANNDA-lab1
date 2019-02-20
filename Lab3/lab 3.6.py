@@ -1,19 +1,20 @@
 import numpy as np
+import matplotlib.pyplot as plt
 np.random.seed(42)
 
-x1 = np.array([-1, -1, 1, -1, 1, -1, -1, 1], dtype = "float")
-x2 = np.array([-1, -1, -1, -1, -1, 1, -1, -1], dtype = "float")
-x3 = np.array([-1, 1, 1, -1, -1, 1, -1, 1], dtype = "float")
+x1 = np.array([0, 0, 1, 0, 1, 0, 0, 1], dtype = "float")
+x2 = np.array([0, 0, 0, 0, 0, 1, 0, 0], dtype = "float")
+x3 = np.array([0, 1, 1, 0, 0, 1, 0, 1], dtype = "float")
 
 
-x1d = np.array([1, -1, 1, -1, 1, -1, -1, 1], dtype = "float")
-x2d = np.array([1, 1, -1, -1, -1, 1, -1, -1], dtype = "float")
-x3d = np.array([1, 1, 1, -1, 1, 1, -1, 1], dtype = "float")
+x1d = np.array([1, 0, 1, 0, 1, 0, 0, 1], dtype = "float")
+x2d = np.array([1, 1, 0, 0, 0, 1, 0, 0], dtype = "float")
+x3d = np.array([1, 1, 1, 0, 1, 1, 0, 1], dtype = "float")
 
 
-x1dist = np.array([1, 1, 1, -1, -1, -1, -1, 1], dtype = "float")
-x2dist = np.array([1, -1, 1, -1, -1, -1, -1, -1], dtype = "float")
-x3dist = np.array([1, 1, -1, -1, -1, 1, 1, 1], dtype = "float")
+x1dist = np.array([1, 1, 1, 0, 0, 0, 0, 1], dtype = "float")
+x2dist = np.array([1, 0, 1, 0, 0, 0, 0, 0], dtype = "float")
+x3dist = np.array([1, 1, 0, 0, 0, 1, 1, 1], dtype = "float")
 
 patterns = np.array([x1, x2, x3])
 
@@ -28,19 +29,32 @@ def weightMatrix(patterns):
 			W[i][j] = s
 	return W
 
+def energy(W, patterns):
+	dim = patterns.size
+	#print(dim)
+	energy = 0
+	for i in range(dim):
+		for j in range(dim):
+				energy += -1*patterns[i]*patterns[j]*W[i][j]
+	return energy
+
+
 def checkConvergence(W, pattern):
 	numIterations = 0
 	previousPattern = np.zeros(pattern.size)
 	while True:
 		res = updateRule(W, pattern)
 		pattern = res
+		en = energy(W, pattern)
+		print("The energy is: ", en)
 		if checkIfTrue(res):
 			print("It took: ", numIterations, "number of iterations.")
 			print("Pattern: ", pattern)
 			break
 		elif np.array_equal(pattern, previousPattern):
 			print("------------------")
-			print("Local minima found in iteration: ", numIterations)
+			print("Local minima found!")
+			print("It took: ", numIterations, "number of iterations.")
 			print("Pattern: ", pattern)
 			break
 		previousPattern = pattern
@@ -60,7 +74,7 @@ def updateRule(W, pattern):
 def checkIfTrue(pattern):
 	for i in range(patterns.shape[0]):
 		if np.array_equal(pattern, patterns[i]):
-			print("-------")
+			print("---------------")
 			print("Matched with x", i+1, "!")
 			return True
 	return False
@@ -122,17 +136,25 @@ if __name__ == '__main__':
 	#returnedPattern2 = updateRule(W, x2)
 	#returnedPattern3 = updateRule(W, x3)
 
-	#checkConvergence(W, x1)
-	#checkConvergence(W, x2)
-	#checkConvergence(W, x3)
+	'''
+	checkConvergence(W, x1)
+	checkConvergence(W, x2)
+	checkConvergence(W, x3)
+	print("\n\n\n")
 
-	#checkConvergence(W, x1d)
-	#checkConvergence(W, x2d)
-	#checkConvergence(W, x3d)
+	"""checkConvergence(W, x1d)
+	checkConvergence(W, x2d)
+	checkConvergence(W, x3d)"""
 
 	checkConvergence(W, x1dist)
 	checkConvergence(W, x2dist)
 	checkConvergence(W, x3dist)
+
+
+	print("\n\n\n--------distorted patterns--------")
+	print("Energy at x1d: ", energy(W, x1d))
+	print("Energy at x2d: ", energy(W, x2d))
+	print("Energy at x3d: ", energy(W, x3d))
 
 	#checkAttractors(W)
 	"""
@@ -141,4 +163,8 @@ if __name__ == '__main__':
 	plt.plot(range(len(testError)), trainError, label = "training error")
 	plt.legend()
 	plt.show()"""
+
+
+	'''
+
 
