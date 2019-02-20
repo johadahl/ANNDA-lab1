@@ -52,7 +52,7 @@ class hebbian:
 				print(x)
 				cont = False
 			# If stuck in an endless oscillating loop
-			if count >= 3:
+			if count >= 10:
 				for i in range(3):
 					if np.array_equal(x, old[i]):
 						print("Updated pattern   %s \nsimilar to old    %s after %s iterations " % (x, old[i], count))

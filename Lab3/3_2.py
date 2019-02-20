@@ -10,22 +10,10 @@ def init_weights(patterns):
             for pattern in patterns:
                 s += pattern[i] * pattern[j]
             w[i][j] = (1 / (patterns.size)) * s
+    np.fill_diagonal(w, 0)  # Reset diagonals to 0
     return w
 
-def calc_energy(pattern, w):
-    dim = pattern.size
-    energy = 0
-
-    enrg = np.multiply(w, np.multiply.outer(pattern, pattern.T)).sum()
-
-    """for i in range(dim):
-        for j in range(dim):
-            energy-= w[i][j]*pattern[i]*pattern[j]
-    """
-    return -enrg
-
 def recall(pattern, w):
-    np.fill_diagonal(w, 0)  # Reset diagonals to 0
     dim = pattern.size
     count = 0
     energyLevels = []
@@ -42,9 +30,6 @@ def recall(pattern, w):
         plt.imshow(pattern.reshape(32, 32), interpolation="nearest")
         plt.show()
 
-        energyLevels.append(calc_energy(pattern, w))
-        # print("Energy: ", calc_energy(pattern,w))
-
         if check_True(pattern):
             print("It took:", count, "nr of iterations")
             plt.imshow(pattern.reshape(32, 32), interpolation="nearest")
@@ -59,12 +44,8 @@ def recall(pattern, w):
 
         previousPattern = pattern
         if count == 50:
+            print("Stopped after 50 iterations")
             break
-
-#    plt.plot(range(len(energyLevels)), energyLevels)
-#    plt.show()
-    # print(energyLevels)
-
 
 def check_True(predicted_pattern):
     solved = False
@@ -74,57 +55,55 @@ def check_True(predicted_pattern):
             solved = True
     return solved
 
-# print(data[0:3,:])
+def generate_random_data(show=False):
+    # Generate random input data
+    r = np.random.randn(1024)
+    for i in range(r.size):
+        if r[i] >= 0:
+            r[i] = 1
+        else:
+            r[i] = -1
+    if show:
+        plt.imshow(data[10].reshape(32, 32), interpolation="nearest")
+        plt.show()
+    return r
 
 def random_recall(pattern, w):
+    np.fill_diagonal(w, 0)  # Reset diagonals to 0
     dim = pattern.size
     count = 0
+
     previousPattern = np.zeros(dim)
-    out = np.ones(dim)
-
     while True:
-        i = np.random.randint(0, dim)
-        p = np.dot(w[i], pattern.T)
-        print("Här e P:", p)
+        i = np.random.randint(0, dim)   # Select random unit
 
-        for j in range(dim):
-            s = 0
-            s += w[i][j] * pattern[j]
-            count += 1
+        s = np.dot(w[i], pattern.T)
+        count += 1
 
-        print("Här e S:", s)
         if s >= 0:
             sign = 1
         else:
             sign = -1
+        pattern[i] = sign
 
-        out[i] = sign
-
-        if (count % 100) == 0:
-            #print("Energy: ", calc_energy(out,w))
-            plt.imshow(out.reshape(32,32),interpolation="nearest")
-            plt.show()
-
-
-        pattern[i] = out[i]
-        # print(pattern)
-
-        # plt.imshow(pattern.reshape(32,32),interpolation="nearest")
-        # plt.show()
+        if (count % 5) == 0:
+            print(count)
+            plt.title("Output after %s iterations" % count)
+            plt.imshow(pattern.reshape(32, 32), interpolation="nearest")
+            f_name = "./gif_32/%s.png" % count
+            plt.savefig(f_name)
+            plt.clf()
 
         if check_True(pattern):
             print("It took:", count, "nr of calculations")
             plt.imshow(pattern.reshape(32, 32), interpolation="nearest")
             plt.show()
             break
-
         previousPattern = pattern
 
 def genRandWeights(patterns):
     dim1 = patterns.shape[1]  # Just to get the size of the weight vector
-
     w = np.random.randn(dim1, dim1)
-    print(w.shape)
     return w
 
 
@@ -161,19 +140,14 @@ def bullet_2():
     plt.show()
     recall(data[10], w)
 
-
 def bullet_3():
-    r = np.random.randn(1024)
-    for i in range(r.size):
-        if r[i] >= 0:
-            r[i] = 1
-        else:
-            r[i] = -1
-    plt.imshow(data[10].reshape(32, 32), interpolation="nearest")
-    plt.show()
-    random_recall(r, w)
+    random_recall(data[10], w)
+
 
 data = np.loadtxt('./pict.dat', delimiter=",", dtype=int).reshape(-1, 1024)
+for d in data:
+    plt.imshow(d.reshape(32, 32), interpolation="nearest")
+    plt.show()
 
 # Init & trains model on p1, p2, p3
 patterns = data[0:3,:]
@@ -186,11 +160,11 @@ print("Weights trained")
 # Bulletpoint 2 - Can the network complete a degraded pattern?
 #bullet_2()
 
-# Bulletpoint 3 - Testing random data
+# Bulletpoint 3 - Testing random units
 bullet_3()
 
 quit()
-random_recall(data[0],w)
+
 
 w = genRandWeights(patterns[0:3, :])
 genStartingState(w)
