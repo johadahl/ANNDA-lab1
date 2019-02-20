@@ -10,6 +10,11 @@ x1d = np.array([1, -1, 1, -1, 1, -1, -1, 1], dtype = "float")
 x2d = np.array([1, 1, -1, -1, -1, 1, -1, -1], dtype = "float")
 x3d = np.array([1, 1, 1, -1, 1, 1, -1, 1], dtype = "float")
 
+
+x1dist = np.array([1, 1, 1, -1, -1, -1, -1, 1], dtype = "float")
+x2dist = np.array([1, -1, 1, -1, -1, -1, -1, -1], dtype = "float")
+x3dist = np.array([1, 1, -1, -1, -1, 1, 1, 1], dtype = "float")
+
 patterns = np.array([x1, x2, x3])
 
 def weightMatrix(patterns):
@@ -125,7 +130,11 @@ if __name__ == '__main__':
 	#checkConvergence(W, x2d)
 	#checkConvergence(W, x3d)
 
-	checkAttractors(W)
+	checkConvergence(W, x1dist)
+	checkConvergence(W, x2dist)
+	checkConvergence(W, x3dist)
+
+	#checkAttractors(W)
 	"""
 
 	plt.plot(range(len(testError)), testError, label = "test error")
