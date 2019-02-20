@@ -19,6 +19,7 @@ def similarity(indata, weights):
                 num_change += 1
     return (winner_row, winner_col)
 
+
 # Takes the index of the winner node, uses the window to call update weight function for
 # appropriate neighbours
 def updateNeighbours(weights, radius, winner, ind, eta=0.2):
@@ -60,6 +61,13 @@ def map_gender(indata, weights):
         winnerNode = similarity(indata[i], weights)  # Find best node
         pos.append([winnerNode, gender[i]])
 
+    for i in pos:
+        if i[1] == 0:   # If male
+            plt.plot(i[0][0], i[0][1], linestyle='', marker='o', color='r')
+        else:
+            plt.plot(i[0][0], i[0][1], linestyle='', marker='o', color='b')
+    plt.show()
+
     male = np.zeros((10, 10))
     female = np.zeros((10, 10))
     ratio = np.full((10, 10), 0.5)
@@ -91,6 +99,9 @@ def map_gender(indata, weights):
     plt.imshow(ratio)
     plt.colorbar()
     plt.show()
+
+
+
 
 def map_party(indata, weights):
     party = np.loadtxt('./data_lab2/mpparty.dat', skiprows=2, dtype=int)
@@ -147,6 +158,13 @@ def map_party(indata, weights):
 
 def map_district(indata, weights):
     district = np.loadtxt('./data_lab2/mpdistrict.dat', dtype=int)
+    print(district)
+
+    y = np.bincount(district)
+    plt.title("Number of representatives per district")
+    plt.hist(district, bins=29)
+    plt.show()
+
     pos = []
     # Loop through data
     for i in range(indata.shape[0]):
@@ -169,11 +187,12 @@ def map_district(indata, weights):
             for k in range(29):
                 count = res[i][j][k]
                 if count > biggest:
-                    biggest = count
+                    biggest = k
             res_maj[i][j] = biggest
             if tot[i][j] == 0:
                 res_maj[i][j] = 'Nan'
 
+    plt.title("SOM of majority of district per node")
     plt.imshow(res_maj)
     plt.colorbar()
     plt.show()

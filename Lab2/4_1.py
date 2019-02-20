@@ -51,7 +51,7 @@ def updateWeights(weights, weight_index, ind, eta=0.2):
 # Trains a SOM
 def trainSOM(indata, weights, epochs=20):
 
-    size = 25  # Size of neighbourhood at start
+    size = 25  # Size of neighbourhood (in each direction) at start
     # For each pattern in indata
     for epoch in range(epochs):  # 20 is standard
         for i in range(indata.shape[0]):

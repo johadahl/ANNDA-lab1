@@ -39,6 +39,9 @@ def recall(pattern, w):
         pattern = s
         count += 1
 
+        plt.imshow(pattern.reshape(32, 32), interpolation="nearest")
+        plt.show()
+
         energyLevels.append(calc_energy(pattern, w))
         # print("Energy: ", calc_energy(pattern,w))
 
@@ -97,10 +100,11 @@ def random_recall(pattern, w):
 
         out[i] = sign
 
-        if (count % 1000) == 0:
-            print("Energy: ", calc_energy(out))
-            # plt.imshow(out.reshape(32,32),interpolation="nearest")
-            # plt.show()
+        if (count % 100) == 0:
+            #print("Energy: ", calc_energy(out,w))
+            plt.imshow(out.reshape(32,32),interpolation="nearest")
+            plt.show()
+
 
         pattern[i] = out[i]
         # print(pattern)
@@ -165,7 +169,9 @@ def bullet_3():
             r[i] = 1
         else:
             r[i] = -1
-    recall(r, w)
+    plt.imshow(data[10].reshape(32, 32), interpolation="nearest")
+    plt.show()
+    random_recall(r, w)
 
 data = np.loadtxt('./pict.dat', delimiter=",", dtype=int).reshape(-1, 1024)
 
@@ -182,7 +188,6 @@ print("Weights trained")
 
 # Bulletpoint 3 - Testing random data
 bullet_3()
-
 
 quit()
 random_recall(data[0],w)

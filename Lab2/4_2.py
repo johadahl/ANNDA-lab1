@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.path import Path
 
 def init_weights():
 #    np.random.seed(42)
@@ -17,7 +16,6 @@ def similarity(indata, weights):
         if sim < winner:
             winner = sim
             winnerNode = i
-    print(winnerNode)
     return winnerNode
 
 
@@ -44,16 +42,24 @@ def updateWeights(weights, weightIndex, ind, eta=0.2):
 
 
 # Trains a SOM
-def trainSOM(indata, weights, epochs=20):
+def trainSOM(indata, weights, epochs=40):
     size = 2  # Size of neighbourhood
 
     for epoch in range(epochs):  # 20 is standard
+
         # For each pattern in indata
         for i in range(indata.shape[0]):
             winnerNode = similarity(indata[i], weights)  # Find best node
             getNeighbours(weights, size, winnerNode, indata[i])  # Get list of neighbours with winnerNode in center
-        plt.plot(weights[:, 0], weights[:, 1], linestyle='-', marker='x', color='r')
-        plt.show()
+            plt.title("Epoch %s, datapoint %s" % (epoch, i))
+            plt.plot(weights[:, 0], weights[:, 1], linestyle='-', marker='x', color='r')
+            for j in indata:
+                plt.plot(j[0], j[1], linestyle='-', marker='o', color='b')
+#            plt.show()
+            f_name = "./img_42/%s_%s.png" % (epoch, i)
+            print(f_name)
+            plt.savefig(f_name)
+            plt.clf()
 
         # Update size of neighbourhood
         if epochs < 15:
@@ -86,8 +92,6 @@ def predictSOM(indata, weights):
 def main():
     indata = np.loadtxt('./data_lab2/cities.dat', delimiter=",", skiprows=4, dtype=str)
     weights = init_weights()
-    plt.plot(weights[:, 0], weights[:, 1], linestyle='-', marker='x', color='r')
-    plt.show()
     for i in range(indata.shape[0]):
         # row = row.strip(";")
         indata[i][1] = indata[i][1].strip(";")
