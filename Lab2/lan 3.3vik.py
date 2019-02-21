@@ -165,11 +165,16 @@ if __name__ == '__main__':
 
 	index = np.linspace(0, (angleVelocity.size-1)/2, 10, dtype = int)
 	b = DeltaRule(angleVelocity, distHeight, angleVelocity[index], 0.01, 100)
-
-	plt.plot(distHeightTest[0], distHeightTest[1], 'green')
-	plt.plot(b.run(distHeightTest)[0], b.run(distHeightTest)[1], 'red')
+	#print(distHeightTest[:,0])
+	#print(distHeightTest[:, 1])
+	plt.scatter(distHeightTest[:,0], distHeightTest[:,1], c = 'blue', label = "Output data")
+	plt.scatter(b.run(angleVelocityTest)[:,0], b.run(angleVelocityTest)[:,1], c = 'orange', label = "Prediction")
+	#plt.scatter(angleVelocityTest[:,1], b.run(angleVelocityTest)[:,0], c = 'blue')
 	#plt.plot(angleVelocity[index], distHeight[index], 'b+')
-	plt.title("Ballist and balltest")
+	plt.title("Balltest")
+	plt.xlabel("Distance")
+	plt.ylabel("Height")
+	plt.legend()
 	plt.show()
 
 
