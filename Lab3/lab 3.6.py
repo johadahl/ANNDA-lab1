@@ -2,17 +2,54 @@ import numpy as np
 import matplotlib.pyplot as plt
 np.random.seed(42)
 
+
 x1 = np.array([0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], dtype = "float")
 x2 = np.array([0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], dtype = "float")
 x3 = np.array([0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], dtype = "float")
 
 
-x1d = np.array([1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], dtype = "float")
-x2d = np.array([1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], dtype = "float")
-x3d = np.array([1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], dtype = "float")
+#x1d = np.array([1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], dtype = "float")
+#x2d = np.array([1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], dtype = "float")
+#x3d = np.array([1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], dtype = "float")
+
+'''
+X1 = np.random.randint(2, size = 100)
+for i in X1:
+	X1[i] = 1
 
 
-patterns = np.array([x1, x2, x3])
+print(X1)
+'''
+#s = np.random.uniform(-1,1,100)
+#r = np.random.randn(100)+0.5
+
+#patterns = [1 for i in range(300) if (np.random.randn(100)+0.5)>0]
+
+sparseTerm10 = 1.27 #This gives 10% activity
+sparseTerm5 = 1.64 #This gives 5% activity
+sparseTerm1 = 2.32 #This gives 1% activity
+
+numPat = 3
+dimen = 100
+patterns=np.zeros((numPat,dimen))
+print(np.shape(patterns))
+for i in range(numPat):
+	pa = np.random.randn(dimen)-sparseTerm10
+	for j in range(len(pa)):
+		if pa[j]>0:
+			patterns[i][j] = 1
+
+
+print("Printing patterns")
+print(patterns)
+
+#print(np.shape(patterns))
+
+
+
+#print(patterns)
+
+#patterns = np.array([x1, x2, x3])
 
 def weightMatrix(patterns, rho):
 	dim = patterns.shape[1] #dimension of pattern (8 in this case)
@@ -39,20 +76,24 @@ def checkConvergence(W, pattern, theta):
 	numIterations = 0
 	previousPattern = np.zeros(pattern.size)
 	while True:
+		#print(numIterations)
 		res = updateRule(W, pattern, theta)
 		pattern = res
 		#en = energy(W, pattern)
 		#print("The energy is: ", en)
 		if checkIfTrue(res):
-			print("It took: ", numIterations, "number of iterations.")
-			print("Pattern: ", pattern)
-			break
+			print("Im true!!")
+			return 1
+			#print("It took: ", numIterations, "number of iterations.")
+			#print("Pattern: ", pattern)
+			#break
 		elif np.array_equal(pattern, previousPattern):
-			print("------------------")
-			print("*******Local minima found!*********")
-			print("It took: ", numIterations, "number of iterations.")
-			print("Pattern: ", pattern)
-			break
+			#print("------------------")
+			#print("*******Local minima found!*********")
+			#print("It took: ", numIterations, "number of iterations.")
+			#print("Pattern: ", pattern)
+			#break
+			return 0
 		previousPattern = pattern
 		numIterations += 1
 
@@ -69,6 +110,10 @@ def updateRule(W, pattern, theta):
 
 def checkIfTrue(pattern):
 	for i in range(patterns.shape[0]):
+		print("Here comes the pattern we are checking")
+		print(pattern)
+		print("Here comes the original pattern. Num: ", i)
+		print(patterns[i])
 		if np.array_equal(pattern, patterns[i]):
 			print("---------------")
 			print("Matched with x", i+1, "!")
@@ -80,7 +125,7 @@ def sign(x):
 	if x>=0:
 		return 1
 	else:
-		return -1
+		return 0
 
 def checkOldList(res, attractors):
 
@@ -126,7 +171,7 @@ def checkAttractors(W):
 	print(attractors)
 
 def calculateRho(all_patterns):
-	print(all_patterns)
+	#print(all_patterns)
 	N = np.size(all_patterns, 1)
 	P = np.size(all_patterns, 0)
 	counts = np.count_nonzero(all_patterns)
@@ -138,17 +183,27 @@ def calculateRho(all_patterns):
 
 if __name__ == '__main__':
 	rho = calculateRho(patterns)
-	#print(rho)
+	print("Activity is: ")
+	print(rho)
 	W = weightMatrix(patterns, rho)
-	
-	#print("x2: ", x2)
-	for i in range(200):
-		theta = 0.01*i
-		print("\nChecking convergence below. Theta =", theta)
-		checkConvergence(W, x1, theta)
-		checkConvergence(W, x2, theta)
-		checkConvergence(W, x3, theta)
 
+	p = patterns[0]
+	#print(p)
+	theta = 0.01
+	print("Convergence is: ")
+	print(checkConvergence(W, p, theta))
+	
+
+	"""
+	#print("x2: ", x2)
+	#for i in range(200):
+	theta = 10
+	print("\nChecking convergence below. Theta =", theta)
+	numTruePatterns = 0
+	for p in patterns:
+		numTruePatterns += checkConvergence(W, p, theta)
+	print("Number of successfully stored pattern was: ", numTruePatterns, "out of ", np.size(patterns,0))
+"""
 	
 	#returnedPattern = updateRule(W, x1, theta)
 	#returnedPattern2 = updateRule(W, x2, theta)
